@@ -42,6 +42,9 @@ server.route({
         });
       });
     });
+  },
+  config: {
+    jsonp: "callback"
   }
 });
 
