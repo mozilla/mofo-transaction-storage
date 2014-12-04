@@ -1,0 +1,31 @@
+{
+  "name": "mofo-transaction-storage",
+  "version": "0.0.0",
+  "description": "Pull down PayPal transactions into a local database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jbuck/mofo-transaction-storage.git"
+  },
+  "keywords": [
+    "coinbase",
+    "paypal"
+  ],
+  "author": "Jon Buckley <jon@jbuckley.ca>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/jbuck/mofo-transaction-storage/issues"
+  },
+  "homepage": "https://github.com/jbuck/mofo-transaction-storage",
+  "dependencies": {
+    "async": "^0.9.0",
+    "habitat": "^3.1.0",
+    "moment": "^2.8.4",
+    "paypal-nvp": "0.0.3",
+    "paypal-nvp-parser": "^1.0.1",
+    "pg.js": "^3.6.2"
+  }
+}
