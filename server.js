@@ -14,7 +14,8 @@ var server = Hapi.createServer(config.host, config.port, {
     connection_string: config.db_connection_string,
     start_date: config.start_date,
     end_date: config.end_date
-  }
+  },
+  cors: true
 });
 
 server.route({
