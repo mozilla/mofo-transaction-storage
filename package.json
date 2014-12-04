@@ -23,6 +23,7 @@
   "dependencies": {
     "async": "^0.9.0",
     "habitat": "^3.1.0",
+    "hapi": "^7.5.2",
     "moment": "^2.8.4",
     "paypal-nvp": "0.0.3",
     "paypal-nvp-parser": "^1.0.1",
