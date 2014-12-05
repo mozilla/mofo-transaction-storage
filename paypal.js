@@ -30,8 +30,9 @@ var step_marker = step_minutes;
 async.forever(function(next) {
 
   console.log("%s -> %s (step %d minutes)", start_marker.toISOString(), end_marker ? end_marker.toISOString() : null, step_marker);
+  var search_fn = async.apply(search_transactions, start_marker.toISOString(), end_marker ? end_marker.toISOString() : null);
 
-  search_transactions(start_marker.toISOString(), end_marker ? end_marker.toISOString() : null, function(err, transactions) {
+  async.retry(search_fn, function(err, transactions) {
     if (err) {
       return next(err);
     }
