@@ -24,7 +24,8 @@ CREATE TABLE paypal (
   status TEXT,
   amount MONEY,
   fee_amount MONEY,
-  currency TEXT
+  currency TEXT,
+  country_code TEXT
 );
 ```
 
