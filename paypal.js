@@ -63,7 +63,15 @@ async.forever(function(next) {
 
     console.log("Added %d transactions", length);
     q.push(list);
-    next();
+
+    if (end_marker) {
+      return next();
+    }
+
+
+    var nextTickTime = step_marker / 4;
+    console.log('Caught up to current time, sleeping for %d minutes', nextTickTime);
+    setTimeout(next, nextTickTime * 60 * 1000);
   });
 }, function(error) {
   throw error;
