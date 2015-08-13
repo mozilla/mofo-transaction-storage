@@ -21,12 +21,13 @@
   },
   "homepage": "https://github.com/jbuck/mofo-transaction-storage",
   "dependencies": {
-    "async": "^0.9.0",
-    "habitat": "^3.1.0",
+    "async": "^1.4.2",
+    "habitat": "^3.1.2",
     "hapi": "^7.5.2",
-    "moment": "^2.8.4",
+    "moment": "^2.10.6",
     "paypal-nvp": "0.0.3",
     "paypal-nvp-parser": "^1.0.1",
-    "pg.js": "^3.6.2"
+    "pg": "^4.4.1",
+    "pg-native": "^1.8.1"
   }
 }

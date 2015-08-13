@@ -5,7 +5,7 @@ var env = new Habitat();
 
 var async = require("async");
 var moment = require("moment");
-var pg = require("pg.js");
+var pg = require("pg").native;
 
 var search_transactions = require("./lib/search")(
   env.get("PAYPAL_USERNAME"),
