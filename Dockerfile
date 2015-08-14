@@ -20,5 +20,5 @@ WORKDIR /app/src
 
 EXPOSE 3000
 
-ONBUILD COPY . /app/src
-ONBUILD RUN npm install
+COPY . /app/src
+RUN npm install

@@ -1,0 +1,11 @@
+web:
+  build: .
+  ports:
+  - 5000:3000
+  command: node server.js
+paypal:
+  build: .
+  command: node paypal.js
+country_codifier:
+  build: .
+  command: node paypal_country_codifier.js
