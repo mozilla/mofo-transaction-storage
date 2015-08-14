@@ -6,7 +6,7 @@ var async = require("async");
 var pg;
 try {
   pg = require("pg").native;
-} catch () {
+} catch (ignore_error) {
   pg = require("pg");
 }
 
