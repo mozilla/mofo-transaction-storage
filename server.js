@@ -5,7 +5,12 @@ var env = new Habitat();
 var config = env.get("SERVER");
 
 var Hapi = require("hapi");
-var pg = require("pg.js");
+var pg;
+try {
+  pg = require("pg").native;
+} catch () {
+  pg = require("pg");
+}
 
 var total_query = "SELECT SUM(amount)::numeric FROM paypal WHERE timestamp > $1 AND timestamp < $2 " +
                    "AND type NOT IN ('Transfer', 'Received Settlement Withdrawal');";

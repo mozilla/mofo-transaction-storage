@@ -3,7 +3,12 @@ Habitat.load();
 var env = new Habitat();
 
 var async = require("async");
-var pg = require("pg").native;
+var pg;
+try {
+  pg = require("pg").native;
+} catch () {
+  pg = require("pg");
+}
 
 var transaction_detail = require("./lib/detail")(
   env.get("PAYPAL_USERNAME"),
