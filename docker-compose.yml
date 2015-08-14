@@ -6,6 +6,6 @@ web:
 paypal:
   build: .
   command: node paypal.js
-country_codifier:
+countrycodifier:
   build: .
   command: node paypal_country_codifier.js
