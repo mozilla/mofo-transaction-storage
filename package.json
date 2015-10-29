@@ -29,6 +29,6 @@
     "paypal-nvp": "0.0.3",
     "paypal-nvp-parser": "1.0.1",
     "pg": "4.4.3",
-    "pg-native": "^1.8.1"
+    "pg-native": "1.9.0"
   }
 }
