@@ -25,7 +25,7 @@
     "boom": "2.10.0",
     "habitat": "3.1.2",
     "hapi": "11.0.2",
-    "moment": "^2.10.6",
+    "moment": "2.10.6",
     "paypal-nvp": "0.0.3",
     "paypal-nvp-parser": "^1.0.1",
     "pg": "^4.4.1",
