@@ -22,8 +22,9 @@
   "homepage": "https://github.com/jbuck/mofo-transaction-storage",
   "dependencies": {
     "async": "1.5.0",
+    "boom": "2.10.0",
     "habitat": "3.1.2",
-    "hapi": "^7.5.2",
+    "hapi": "11.0.2",
     "moment": "^2.10.6",
     "paypal-nvp": "0.0.3",
     "paypal-nvp-parser": "^1.0.1",

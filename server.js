@@ -4,6 +4,7 @@ Habitat.load();
 var env = new Habitat();
 var config = env.get("SERVER");
 
+var Boom = require("boom");
 var Hapi = require("hapi");
 var pg;
 try {
@@ -17,13 +18,16 @@ var total_query = "SELECT SUM(amount)::numeric FROM paypal WHERE timestamp > $1 
 var bycountry_query = "SELECT country_code, sum(amount)::numeric, count(*) FROM paypal " +
                       "WHERE timestamp > $1 AND timestamp < $2 AND country_code IS NOT NULL " +
                       "GROUP BY country_code;";
-var server = Hapi.createServer(config.host, config.port, {
+var server = new Hapi.Server({
   app: {
     connection_string: config.db_connection_string,
     start_date: config.start_date,
     end_date: config.end_date
-  },
-  cors: true
+  }
+});
+
+server.connection({
+  port: config.port
 });
 
 server.route({
@@ -36,14 +40,14 @@ server.route({
 
     pg.connect(connection_string, function(pool_error, client, done) {
       if (pool_error) {
-        return reply(Hapi.error.badImplementation("A database pool connection error occurred", pool_error));
+        return reply(Boom.badImplementation("A database pool connection error occurred", pool_error));
       }
 
       client.query(total_query, [start_date, end_date], function(query_error, result) {
         done();
 
         if (query_error) {
-          return reply(Hapi.error.badImplementation("A database query error occurred", query_error));
+          return reply(Boom.badImplementation("A database query error occurred", query_error));
         }
 
         reply({
@@ -53,6 +57,7 @@ server.route({
     });
   },
   config: {
+    cors: true,
     jsonp: "callback"
   }
 });
@@ -67,14 +72,14 @@ server.route({
 
     pg.connect(connection_string, function(pool_error, client, done) {
       if (pool_error) {
-        return reply(Hapi.error.badImplementation("A database pool connection error occurred", pool_error));
+        return reply(Boom.badImplementation("A database pool connection error occurred", pool_error));
       }
 
       client.query(bycountry_query, [start_date, end_date], function(query_error, result) {
         done();
 
         if (query_error) {
-          return reply(Hapi.error.badImplementation("A database query error occurred", query_error));
+          return reply(Boom.badImplementation("A database query error occurred", query_error));
         }
 
         var data = result.rows.map(function(row) {
@@ -87,6 +92,7 @@ server.route({
     });
   },
   config: {
+    cors: true,
     jsonp: "callback"
   }
 });
