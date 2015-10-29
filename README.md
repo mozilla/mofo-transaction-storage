@@ -4,8 +4,8 @@ Pull down Coinbase & PayPal transactions into a database for various sundry porp
 
 ## Requirements
 
-* node.js ^0.10.33
-* postgres ^9.3.5
+* node.js 4
+* postgres 9.4
 * PayPal Classic API credentials
 
 ## Setup
@@ -39,7 +39,6 @@ Create a file named `.env` to place configuration options in.
 * PAYPAL_SIGNATURE
 * PAYPAL_START_DATE
 * PAYPAL_STEP_MINUTES
-* SERVER_HOST
 * SERVER_PORT
 * SERVER_DB_CONNECTION_STRING
 * SERVER_START_DATE

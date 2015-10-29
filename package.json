@@ -11,7 +11,6 @@
     "url": "https://github.com/jbuck/mofo-transaction-storage.git"
   },
   "keywords": [
-    "coinbase",
     "paypal"
   ],
   "author": "Jon Buckley <jon@jbuckley.ca>",
@@ -30,5 +29,8 @@
     "paypal-nvp-parser": "1.0.1",
     "pg": "4.4.3",
     "pg-native": "1.9.0"
+  },
+  "engine": {
+    "node": "4.2.1"
   }
 }

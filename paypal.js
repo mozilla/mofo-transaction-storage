@@ -17,14 +17,19 @@ var search_transactions = require("./lib/search")(
   env.get("PAYPAL_PASSWORD"),
   env.get("PAYPAL_SIGNATURE")
 );
+var transaction_detail = require("./lib/detail")(
+  env.get("PAYPAL_USERNAME"),
+  env.get("PAYPAL_PASSWORD"),
+  env.get("PAYPAL_SIGNATURE")
+);
 
 var start_date = moment.utc(env.get("PAYPAL_START_DATE"));
 var step_minutes = env.get("PAYPAL_STEP_MINUTES");
 var insert_query = "INSERT INTO paypal (id, timestamp, type, email, name, status, " +
-                   "amount, fee_amount, currency) " +
-                   "SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9";
+                   "amount, fee_amount, currency, country_code) " +
+                   "SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10";
 var update_query = "UPDATE paypal SET timestamp=$2, type=$3, email=$4, name=$5, " +
-                   "status=$6, amount=$7, fee_amount=$8, currency=$9 WHERE id = $1";
+                   "status=$6, amount=$7, fee_amount=$8, currency=$9, country_code=$10 WHERE id = $1";
 var upsert_query = "WITH upsert AS (" + update_query + " RETURNING *) " + insert_query +
                    " WHERE NOT EXISTS (SELECT * FROM upsert);";
 
@@ -33,8 +38,6 @@ var end_marker = moment.utc(start_date).add(step_minutes, 'minutes');
 var step_marker = step_minutes;
 
 async.forever(function(next) {
-
-  console.log("%s -> %s (step %d minutes)", start_marker.toISOString(), end_marker ? end_marker.toISOString() : null, step_marker);
   var search_fn = async.apply(search_transactions, start_marker.toISOString(), end_marker ? end_marker.toISOString() : null);
 
   async.retry(search_fn, function(err, transactions) {
@@ -66,8 +69,8 @@ async.forever(function(next) {
       end_marker = null
     }
 
-    console.log("Added %d transactions", length);
-    q.push(list);
+    console.log("Added %d transactions from %s -> %s (%d minutes)", length, start_marker.toISOString(), end_marker ? end_marker.toISOString() : "now", step_marker);
+    detail_q.push(list);
 
     if (end_marker) {
       return next();
@@ -82,7 +85,19 @@ async.forever(function(next) {
   throw error;
 });
 
-var q = async.queue(function(task, next) {
+var detail_q = async.queue(function(task, next) {
+  transaction_detail(task.TRANSACTIONID, function(paypal_error, transaction) {
+    if (paypal_error) {
+      return next(paypal_error);
+    }
+
+    task.COUNTRYCODE = transaction.COUNTRYCODE;
+    insert_q.push(task);
+    next();
+  });
+}, 8);
+
+var insert_q = async.queue(function(task, next) {
   pg.connect(env.get("PAYPAL_DB_CONNECTION_STRING"), function(err, client, done) {
     if (err) {
       return next(err);
@@ -97,10 +112,11 @@ var q = async.queue(function(task, next) {
       task.STATUS,
       task.AMT,
       task.FEEAMT,
-      task.CURRENCYCODE
+      task.CURRENCYCODE,
+      task.COUNTRYCODE
     ], function(err, result) {
       done();
       next(err);
     });
   });
-}, 1);
+}, 8);
