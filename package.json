@@ -30,7 +30,7 @@
     "pg": "4.4.3",
     "pg-native": "1.9.0"
   },
-  "engine": {
+  "engines": {
     "node": "4.2.1"
   }
 }
