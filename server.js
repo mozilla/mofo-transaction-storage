@@ -3,6 +3,7 @@ var Habitat = require("habitat");
 Habitat.load();
 var env = new Habitat();
 var config = env.get("SERVER");
+config.port = env.get("PORT");
 
 var Boom = require("boom");
 var Hapi = require("hapi");
@@ -19,77 +20,43 @@ var bycountry_query = "SELECT country_code, sum(amount)::numeric, count(*) FROM 
                       "WHERE timestamp > $1 AND timestamp < $2 AND country_code IS NOT NULL " +
                       "GROUP BY country_code;";
 var server = new Hapi.Server({
-  app: {
-    connection_string: config.db_connection_string,
-    start_date: config.start_date,
-    end_date: config.end_date
-  }
+  cache: require("catbox-memory")
 });
 
 server.connection({
   port: config.port
 });
 
-server.route({
-  method: "GET",
-  path: "/eoy-2014-total",
-  handler: function(request, reply) {
-    var connection_string = request.server.settings.app.connection_string;
-    var start_date = request.server.settings.app.start_date;
-    var end_date = request.server.settings.app.end_date;
+server.method("total", function(start_date, end_date, next) {
+  pg.connect(config.db_connection_string, function(pool_error, client, pg_done) {
+    if (pool_error) {
+      return next(Boom.badImplementation("A database pool connection error occurred", pool_error));
+    }
 
-    pg.connect(connection_string, function(pool_error, client, done) {
-      if (pool_error) {
-        return reply(Boom.badImplementation("A database pool connection error occurred", pool_error));
+    client.query(total_query, [start_date, end_date], function(query_error, result) {
+      pg_done();
+
+      if (query_error) {
+        return next(Boom.badImplementation("A database query error occurred", query_error));
       }
 
-      client.query(total_query, [start_date, end_date], function(query_error, result) {
-        done();
-
-        if (query_error) {
-          return reply(Boom.badImplementation("A database query error occurred", query_error));
-        }
-
-        reply({
-          sum: parseFloat(result.rows[0].sum, 10)
-        });
+      next(null, {
+        sum: parseFloat(result.rows[0].sum, 10)
       });
     });
-  },
-  config: {
-    cors: true,
-    jsonp: "callback"
+  });
+}, {
+  cache: {
+    expiresIn: 5 * 1000,
+    generateTimeout: 1 * 1000
   }
 });
 
 server.route({
   method: "GET",
-  path: "/eoy-2014-bycountry",
+  path: "/eoy-2014-total",
   handler: function(request, reply) {
-    var connection_string = request.server.settings.app.connection_string;
-    var start_date = request.server.settings.app.start_date;
-    var end_date = request.server.settings.app.end_date;
-
-    pg.connect(connection_string, function(pool_error, client, done) {
-      if (pool_error) {
-        return reply(Boom.badImplementation("A database pool connection error occurred", pool_error));
-      }
-
-      client.query(bycountry_query, [start_date, end_date], function(query_error, result) {
-        done();
-
-        if (query_error) {
-          return reply(Boom.badImplementation("A database query error occurred", query_error));
-        }
-
-        var data = result.rows.map(function(row) {
-          row.sum = parseFloat(row.sum, 10);
-          row.count = parseInt(row.count, 10);
-          return row;
-        });
-        reply(data);
-      });
-    });
+    server.methods.total(config.start_date, config.end_date, reply);
   },
   config: {
     cors: true,

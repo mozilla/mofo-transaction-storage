@@ -22,6 +22,7 @@
   "dependencies": {
     "async": "1.5.0",
     "boom": "2.10.0",
+    "catbox-memory": "1.1.2",
     "habitat": "3.1.2",
     "hapi": "11.0.2",
     "moment": "2.10.6",
