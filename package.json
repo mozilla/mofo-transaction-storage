@@ -21,7 +21,7 @@
   "homepage": "https://github.com/jbuck/mofo-transaction-storage",
   "dependencies": {
     "async": "1.5.0",
-    "boom": "2.10.0",
+    "boom": "2.10.1",
     "catbox-memory": "1.1.2",
     "habitat": "3.1.2",
     "hapi": "11.0.2",
