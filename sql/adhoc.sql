@@ -23,6 +23,29 @@ SELECT * FROM (
   WHERE num_reversed <= 1;
 
 
+-- Donor history for EOY email selections
+SELECT email,
+  highest_previous_gift::numeric,
+  most_recent_donation_date,
+  number_of_donations,
+  CASE WHEN num_completed_in_prior_months >= 3 THEN TRUE ELSE FALSE END as is_regular_donor
+ FROM (
+  SELECT email,
+    MAX(timestamp) as most_recent_donation_date,
+    SUM(CASE WHEN status='Completed' AND timestamp > NOW() - INTERVAL '120 days' THEN 1 ELSE 0 END) as num_completed_in_prior_months,
+    SUM(CASE WHEN status='Reversed' THEN 1 ELSE 0 END) as num_reversed,
+    COUNT(1) as number_of_donations,
+    MAX(CASE WHEN status='Completed' THEN amount ELSE '0'::money END) as highest_previous_gift
+  FROM paypal
+  --WHERE country_code = 'CA'
+  GROUP BY email
+  ORDER BY highest_previous_gift DESC
+) AS aggregates
+  WHERE num_reversed <= 1
+  AND highest_previous_gift > '0.5'::money
+  ORDER BY is_regular_donor DESC, num_completed_in_prior_months DESC, number_of_donations;
+
+
 
 
 -- Transaction Types
