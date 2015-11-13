@@ -31,9 +31,9 @@ CREATE TABLE paypal (
 CREATE TABLE stripe (
   id TEXT PRIMARY KEY,
   timestamp TIMESTAMP WITH TIME ZONE,
-  amount INTEGER,
+  amount MONEY,
   settle_amount MONEY,
-  refunded INTEGER,
+  refunded MONEY,
   currency TEXT,
   status TEXT,
   country_code TEXT,
