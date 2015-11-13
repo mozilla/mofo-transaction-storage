@@ -64,6 +64,12 @@ server.route({
   }
 });
 
+server.route({
+  method: "POST",
+  path: "/webhooks/stripe",
+  handler: require("./stripe.js")
+});
+
 server.start(function() {
   console.log('Server running at: %s', server.info.uri);
 });

@@ -27,6 +27,19 @@ CREATE TABLE paypal (
   currency TEXT,
   country_code TEXT
 );
+
+CREATE TABLE stripe (
+  id TEXT PRIMARY KEY,
+  timestamp TIMESTAMP WITH TIME ZONE,
+  amount INTEGER,
+  settle_amount MONEY,
+  refunded INTEGER,
+  currency TEXT,
+  status TEXT,
+  country_code TEXT,
+  name TEXT,
+  email TEXT
+);
 ```
 
 ### Environment
@@ -43,3 +56,6 @@ Create a file named `.env` to place configuration options in.
 * SERVER_DB_CONNECTION_STRING
 * SERVER_START_DATE
 * SERVER_END_DATE
+* STRIPE_API_KEY
+* OXR_APP_ID
+* STRIPE_DB_CONNECTION_STRING
