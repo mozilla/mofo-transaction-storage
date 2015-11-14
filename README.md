@@ -23,6 +23,7 @@ CREATE TABLE paypal (
   name TEXT,
   status TEXT,
   amount MONEY,
+  settle_amount MONEY,
   fee_amount MONEY,
   currency TEXT,
   country_code TEXT
