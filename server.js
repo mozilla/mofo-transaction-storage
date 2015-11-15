@@ -15,7 +15,8 @@ try {
 }
 
 var total_query = "SELECT SUM(settle_amount)::numeric FROM paypal WHERE timestamp > $1 AND timestamp < $2 " +
-                   "AND type NOT IN ('Transfer', 'Received Settlement Withdrawal');";
+                   "AND ((type IN ('Donation', 'Payment') AND status = 'Completed') " +
+                   "OR type = 'Temporary Hold');";
 var bycountry_query = "SELECT country_code, sum(amount)::numeric, count(*) FROM paypal " +
                       "WHERE timestamp > $1 AND timestamp < $2 AND country_code IS NOT NULL " +
                       "GROUP BY country_code;";
