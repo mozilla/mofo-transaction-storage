@@ -60,8 +60,9 @@ async.forever(function(next) {
       return next();
     }
 
-    var now = moment.utc();
+    console.log("Added %d transactions from %s -> %s (%d minutes)", length, start_marker.toISOString(), end_marker ? end_marker.toISOString() : "now", step_marker);
 
+    var now = moment.utc();
     if (end_marker && end_marker < now) {
       start_marker = end_marker;
       end_marker = moment.utc(start_marker).add(step_marker, 'minutes');
@@ -70,13 +71,11 @@ async.forever(function(next) {
       end_marker = null
     }
 
-    console.log("Added %d transactions from %s -> %s (%d minutes)", length, start_marker.toISOString(), end_marker ? end_marker.toISOString() : "now", step_marker);
     detail_q.push(list);
 
     if (end_marker) {
       return next();
     }
-
 
     var nextTickTime = step_marker / 4;
     console.log('Caught up to current time, sleeping for %d minutes', nextTickTime);
