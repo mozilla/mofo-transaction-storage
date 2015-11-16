@@ -1,15 +1,7 @@
 var Boom = require('boom');
 var process_charge = require('./lib/stripe').process_charge;
 
-/*
-Configure stripe to only hit this endpoint with the following events:
-- charge.succeeded
-- charge.captured
-- charge.failed
-- charge.refunded
-- charge.updated
-*/
-
+// Configure stripe to only hit this endpoint with the following events:
 const allowed_events = [
   "charge.succeeded",
   "charge.captured",
