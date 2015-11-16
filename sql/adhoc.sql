@@ -52,10 +52,13 @@ SELECT email,
 SELECT DISTINCT type, status FROM paypal ORDER BY type, status;
 
 -- "Authorization";"Expired"
+-- "Authorization";"Pending"
 -- "Bill";"Pending"
 -- "Canceled Payment";"Completed"
 -- "Currency Conversion (credit)";"Completed"
+-- "Currency Conversion (credit)";"Pending"
 -- "Currency Conversion (debit)";"Completed"
+-- "Currency Conversion (debit)";"Pending"
 -- "Donation";"Canceled"
 -- "Donation";"Cleared"
 -- "Donation";"Completed"
@@ -65,11 +68,13 @@ SELECT DISTINCT type, status FROM paypal ORDER BY type, status;
 -- "Donation";"Reversed"
 -- "Donation";"Uncleared"
 -- "Fee Reversal";"Completed"
+-- "Fee Reversal";"Pending"
 -- "Payment";"Canceled"
 -- "Payment";"Cleared"
 -- "Payment";"Completed"
 -- "Payment";"Held"
 -- "Payment";"Partially Refunded"
+-- "Payment";"Pending"
 -- "Payment";"Refunded"
 -- "Payment";"Returned"
 -- "Payment";"Reversed"
@@ -80,6 +85,7 @@ SELECT DISTINCT type, status FROM paypal ORDER BY type, status;
 -- "Recurring Payment";"Completed"
 -- "Recurring Payment";"Created"
 -- "Refund";"Completed"
+-- "Refund";"Pending"
 -- "Reversal";"Completed"
 -- "Subscription Cancellation";"Canceled"
 -- "Subscription Creation";"Active"
@@ -88,7 +94,7 @@ SELECT DISTINCT type, status FROM paypal ORDER BY type, status;
 -- "Temporary Hold";"Removed"
 -- "Transfer";"Completed"
 -- "Transfer";"Denied"
-
+-- "Transfer";"Uncleared"
 
 
 -- Looking at spam

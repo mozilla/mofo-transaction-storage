@@ -14,7 +14,7 @@ try {
   pg = require("pg");
 }
 
-var total_query = "SELECT SUM(amount)::numeric FROM paypal WHERE timestamp > $1 AND timestamp < $2 " +
+var total_query = "SELECT SUM(settle_amount)::numeric FROM paypal WHERE timestamp > $1 AND timestamp < $2 " +
                    "AND type NOT IN ('Transfer', 'Received Settlement Withdrawal');";
 var bycountry_query = "SELECT country_code, sum(amount)::numeric, count(*) FROM paypal " +
                       "WHERE timestamp > $1 AND timestamp < $2 AND country_code IS NOT NULL " +

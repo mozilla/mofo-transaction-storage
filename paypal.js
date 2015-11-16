@@ -26,10 +26,11 @@ var transaction_detail = require("./lib/detail")(
 var start_date = moment.utc(env.get("PAYPAL_START_DATE"));
 var step_minutes = env.get("PAYPAL_STEP_MINUTES");
 var insert_query = "INSERT INTO paypal (id, timestamp, type, email, name, status, " +
-                   "amount, fee_amount, currency, country_code) " +
-                   "SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10";
+                   "amount, settle_amount, fee_amount, currency, country_code) " +
+                   "SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11";
 var update_query = "UPDATE paypal SET timestamp=$2, type=$3, email=$4, name=$5, " +
-                   "status=$6, amount=$7, fee_amount=$8, currency=$9, country_code=$10 WHERE id = $1";
+                   "status=$6, amount=$7, settle_amount=$8, fee_amount=$9, " +
+                   "currency=$10, country_code=$11 WHERE id = $1";
 var upsert_query = "WITH upsert AS (" + update_query + " RETURNING *) " + insert_query +
                    " WHERE NOT EXISTS (SELECT * FROM upsert);";
 
@@ -92,6 +93,11 @@ var detail_q = async.queue(function(task, next) {
     }
 
     task.COUNTRYCODE = transaction.COUNTRYCODE;
+    task.settle_amount = transaction.AMT;
+    if (task.CURRENCYCODE && task.CURRENCYCODE !== 'USD' && transaction.EXCHANGERATE) {
+      task.settle_amount = (transaction.AMT * transaction.EXCHANGERATE * 100 | 0 ) / 100;
+    }
+
     insert_q.push(task);
     next();
   });
@@ -111,6 +117,7 @@ var insert_q = async.queue(function(task, next) {
       task.NAME,
       task.STATUS,
       task.AMT,
+      task.settle_amount,
       task.FEEAMT,
       task.CURRENCYCODE,
       task.COUNTRYCODE
