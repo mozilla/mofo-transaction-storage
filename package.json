@@ -25,6 +25,7 @@
     "catbox-memory": "1.1.2",
     "habitat": "3.1.2",
     "hapi": "11.0.3",
+    "hapi-auth-bearer-token": "3.1.1",
     "moment": "2.10.6",
     "money": "0.2.0",
     "open-exchange-rates": "0.3.0",
