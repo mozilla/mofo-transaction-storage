@@ -25,11 +25,15 @@
     "catbox-memory": "1.1.2",
     "habitat": "3.1.2",
     "hapi": "11.0.3",
+    "hapi-auth-bearer-token": "3.1.1",
     "moment": "2.10.6",
+    "money": "0.2.0",
+    "open-exchange-rates": "0.3.0",
     "paypal-nvp": "0.0.3",
     "paypal-nvp-parser": "1.0.1",
     "pg": "4.4.3",
-    "pg-native": "1.9.0"
+    "pg-native": "1.9.0",
+    "stripe": "4.0.0"
   },
   "engines": {
     "node": "4.2.1"

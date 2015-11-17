@@ -21,12 +21,24 @@ var bycountry_query = "SELECT country_code, sum(amount)::numeric, count(*) FROM 
                       "WHERE timestamp > $1 AND timestamp < $2 AND country_code IS NOT NULL " +
                       "GROUP BY country_code;";
 var server = new Hapi.Server({
+  app: {
+    stripe_secret: config.stripe_secret
+  },
   cache: require("catbox-memory")
 });
 
 server.connection({
   port: config.port
 });
+
+server.register(require("hapi-auth-bearer-token"), function(err) {});
+
+  server.auth.strategy("stripe", "bearer-access-token", {
+    validateFunc: function(token, callback) {
+      // this = request
+      callback(null, token === this.server.settings.app.stripe_secret, { token: token });
+    }
+  });
 
 server.method("total", function(start_date, end_date, next) {
   pg.connect(config.db_connection_string, function(pool_error, client, pg_done) {
@@ -63,6 +75,16 @@ server.route({
     cors: true,
     jsonp: "callback"
   }
+});
+
+// set up webhook url as `https://{server_uri}/stripe/callback?token={stripe_secret}` using the stripe dashboard
+server.route({
+  method: "POST",
+  path: "/stripe/callback",
+  config: {
+    auth: "stripe"
+  },
+  handler: require("./stripe.js")
 });
 
 server.start(function() {
