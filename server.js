@@ -60,8 +60,8 @@ server.method("total", function(start_date, end_date, next) {
   });
 }, {
   cache: {
-    expiresIn: 5 * 1000,
-    generateTimeout: 1 * 1000
+    expiresIn: 10 * 1000,
+    generateTimeout: 2 * 1000
   }
 });
 
