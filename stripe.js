@@ -13,7 +13,7 @@ const allowed_events = [
 module.exports = function(request, reply) {
   var event = request.payload;
 
-  if (allowed_events.indexOf(event.type.toLowerCase()) === -1 {
+  if (allowed_events.indexOf(event.type.toLowerCase()) === -1) {
     return reply("Event type not supported");
   }
 
