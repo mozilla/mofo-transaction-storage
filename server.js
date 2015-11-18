@@ -14,9 +14,11 @@ try {
   pg = require("pg");
 }
 
-var total_query = "SELECT SUM(settle_amount)::numeric FROM paypal WHERE timestamp > $1 AND timestamp < $2 " +
+var paypal_query = "SELECT SUM(settle_amount)::numeric FROM paypal WHERE timestamp > $1 AND timestamp < $2 " +
                    "AND ((type IN ('Donation', 'Payment') AND status = 'Completed') " +
                    "OR type = 'Temporary Hold');";
+var stripe_query = "SELECT SUM(settle_amount)::numeric FROM stripe WHERE refunded = '0.00' " +
+                   "AND timestamp > $1 AND timestamp < $2;";
 var bycountry_query = "SELECT country_code, sum(amount)::numeric, count(*) FROM paypal " +
                       "WHERE timestamp > $1 AND timestamp < $2 AND country_code IS NOT NULL " +
                       "GROUP BY country_code;";
@@ -46,15 +48,21 @@ server.method("total", function(start_date, end_date, next) {
       return next(Boom.badImplementation("A database pool connection error occurred", pool_error));
     }
 
-    client.query(total_query, [start_date, end_date], function(query_error, result) {
-      pg_done();
-
-      if (query_error) {
-        return next(Boom.badImplementation("A database query error occurred", query_error));
+    client.query(paypal_query, [start_date, end_date], function(paypal_error, paypal_result) {
+      if (paypal_error) {
+        return next(Boom.badImplementation("A paypal database query error occurred", paypal_error));
       }
 
-      next(null, {
-        sum: parseFloat(result.rows[0].sum, 10)
+      client.query(stripe_query, [start_date, end_date], function(stripe_error, stripe_result) {
+        pg_done();
+
+        if (stripe_error) {
+          return next(Boom.badImplementation("A stripe database query error occurred", stripe_error));
+        }
+
+        next(null, {
+          sum: parseFloat(paypal_result.rows[0].sum, 10) + parseFloat(stripe_result.rows[0].sum, 10)
+        });
       });
     });
   });
