@@ -23,7 +23,7 @@ SELECT * FROM (
   WHERE num_reversed <= 1;
 
 
--- Donor history for EOY email selections
+-- Paypal history EOY email selections
 SELECT email,
   highest_previous_gift::numeric,
   most_recent_donation_date,
@@ -44,6 +44,69 @@ SELECT email,
   WHERE num_reversed <= 1
   AND highest_previous_gift > '0.5'::money
   ORDER BY is_regular_donor DESC, num_completed_in_prior_months DESC, number_of_donations;
+
+
+
+-- Combined Paypal and Stripe data for donor history view
+SELECT aggregates.email,
+  aggregates.highest_previous_gift::numeric AS highest_previous_gift,
+  aggregates.most_recent_donation_date,
+  aggregates.number_of_donations,
+    CASE
+        WHEN aggregates.num_completed_in_prior_months >= 3 THEN TRUE
+        ELSE FALSE
+    END AS is_regular_donor
+
+  FROM (
+  -- group and sum the individual records
+    SELECT combined.email,
+    MAX(combined."timestamp") as most_recent_donation_date,
+    SUM(
+        CASE
+            WHEN combined.status='Completed'::text AND combined."timestamp" > (NOW() - INTERVAL '120 days'::interval) THEN 1
+            ELSE 0
+        END) as num_completed_in_prior_months,
+    SUM(
+        CASE
+            WHEN combined.status='Reversed'::text THEN 1
+            ELSE 0
+        END) as num_reversed,
+    COUNT(1) as number_of_donations,
+    MAX(
+        CASE
+            WHEN combined.status='Completed'::text THEN
+                -- use settle_amount if available
+                CASE
+                    WHEN combined.settle_amount IS NOT NULL THEN combined.settle_amount
+                    ELSE combined.amount
+                END
+            ELSE '$0.00'::money
+        END) as highest_previous_gift
+
+    FROM
+        -- combine the paypal and stripe data into one table
+        (SELECT
+            paypal."timestamp", paypal.email, paypal.status, paypal.amount, paypal.settle_amount
+            FROM paypal
+        UNION ALL
+        SELECT
+            stripe."timestamp", stripe.email, stripe.status, stripe.amount, stripe.settle_amount
+            FROM stripe
+        ) as combined
+    -- perform the group by
+    GROUP BY email
+  ) AS aggregates
+
+    WHERE aggregates.num_reversed <= 1 AND aggregates.highest_previous_gift > '$0.50'::money
+    ORDER BY
+      CASE
+        WHEN aggregates.num_completed_in_prior_months >= 3 THEN true
+        ELSE false
+      END
+    DESC,
+    aggregates.num_completed_in_prior_months DESC,
+    aggregates.number_of_donations;
+
 
 
 
