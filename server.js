@@ -18,7 +18,7 @@ var paypal_query = "SELECT SUM(settle_amount)::numeric FROM paypal WHERE timesta
                    "AND ((type IN ('Donation', 'Payment') AND status = 'Completed') " +
                    "OR type = 'Temporary Hold');";
 var stripe_query = "SELECT SUM(settle_amount)::numeric FROM stripe WHERE refunded = '0.00' " +
-                   "AND timestamp > $1 AND timestamp < $2;";
+                   "AND status = 'succeeded' AND timestamp > $1 AND timestamp < $2;";
 var bycountry_query = "SELECT country_code, sum(amount)::numeric, count(*) FROM paypal " +
                       "WHERE timestamp > $1 AND timestamp < $2 AND country_code IS NOT NULL " +
                       "GROUP BY country_code;";
