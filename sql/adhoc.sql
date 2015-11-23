@@ -164,3 +164,33 @@ SELECT DISTINCT type, status FROM paypal ORDER BY type, status;
 SELECT type, status, SUM(amount) FROM paypal
   WHERE email='x'
   GROUP BY type, status;
+
+
+
+-- Daily totals
+
+SELECT
+  day,
+  SUM(total)
+ FROM
+   (SELECT
+        SUM(settle_amount)::numeric as total,
+        DATE(timestamp) as day
+      FROM paypal
+      WHERE timestamp > '2015-11-01'
+      AND ((type IN ('Donation', 'Payment') AND status = 'Completed') OR type = 'Temporary Hold')
+      GROUP BY DATE(timestamp)
+
+    UNION ALL
+
+    SELECT
+        SUM(settle_amount)::numeric as total,
+        DATE(timestamp) as day
+      FROM stripe
+      WHERE timestamp > '2015-11-01'
+      AND refunded = '0.00'
+      GROUP BY DATE(timestamp)
+    ) as combined
+
+    GROUP BY day
+    ORDER BY day
