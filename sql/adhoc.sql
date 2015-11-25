@@ -188,9 +188,9 @@ SELECT
         DATE(timestamp) as day
       FROM stripe
       WHERE timestamp > '2015-11-01'
-      AND refunded = '0.00'
+      AND refunded = '0.00' AND status = 'succeeded'
       GROUP BY DATE(timestamp)
     ) as combined
 
     GROUP BY day
-    ORDER BY day
+    ORDER BY day;
