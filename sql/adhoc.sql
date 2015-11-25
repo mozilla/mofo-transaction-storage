@@ -177,7 +177,7 @@ SELECT
         SUM(settle_amount)::numeric as total,
         DATE(timestamp) as day
       FROM paypal
-      WHERE timestamp > '2015-11-01'
+      WHERE timestamp > '2015-10-04T07:00:00.000Z'
       AND ((type IN ('Donation', 'Payment') AND status = 'Completed') OR type = 'Temporary Hold')
       GROUP BY DATE(timestamp)
 
@@ -187,7 +187,8 @@ SELECT
         SUM(settle_amount)::numeric as total,
         DATE(timestamp) as day
       FROM stripe
-      WHERE timestamp > '2015-11-01'
+      WHERE timestamp > '2015-10-04T07:00:00.000Z'
+      AND status = 'succeeded'
       AND refunded = '0.00' AND status = 'succeeded'
       GROUP BY DATE(timestamp)
     ) as combined
