@@ -26,7 +26,7 @@ var bycountry_query = `SELECT country_code, sum(total)::numeric AS total, sum(do
                        AND ((type IN ('Donation', 'Payment') AND status = 'Completed')
                        OR type = 'Temporary Hold') AND country_code IS NOT NULL
                        GROUP BY country_code
-                       UNION
+                       UNION ALL
                        SELECT country_code, sum(amount)::numeric, count(*) FROM stripe
                        WHERE timestamp > $1 AND timestamp < $2
                        AND refunded = '0.00' AND status = 'succeeded'
