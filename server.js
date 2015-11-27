@@ -122,7 +122,15 @@ server.route({
   method: "GET",
   path: "/eoy-2014-bycountry",
   handler: function(request, reply) {
-    server.methods.total_by_country(config.start_date, config.end_date, reply);
+    server.methods.total_by_country(config.start_date, config.end_date, (query_error, results) => {
+      reply(query_error, results.map((r) => {
+        return {
+          country_code: r.country_code,
+          sum: parseFloat(r.total, 10),
+          count: parseInt(r.donors, 10)
+        };
+      }));
+    });
   },
   config: {
     cors: true,
