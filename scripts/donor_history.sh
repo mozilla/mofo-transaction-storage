@@ -5,7 +5,7 @@ set -o nounset
 set -o pipefail
 #set -o xtrace
 
-SCRATCH_FILE="scratch/donorhistory_`date -u +%FT%TZ`.csv"
+SCRATCH_FILE="scratch/donorhistory_`date -u +%FT%H-%M-%SZ`.csv"
 SFTP_BATCH_FILE=`cat <<EOF
 cd FoundationDonors/
 ls
