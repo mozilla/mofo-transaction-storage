@@ -33,6 +33,20 @@ var bycountry_query = `SELECT country_code, sum(total)::numeric AS total, sum(do
                        GROUP BY country_code
                        ) AS bycountry GROUP BY bycountry.country_code ORDER BY bycountry.country_code`;
 
+
+var byday_query = `SELECT day, SUM(total) AS total FROM
+                  (SELECT SUM(settle_amount)::numeric as total, date_trunc('day', timestamp) as day FROM paypal
+                    WHERE timestamp > $1 AND timestamp < $2
+                    AND ((type IN ('Donation', 'Payment') AND status = 'Completed') OR type = 'Temporary Hold')
+                    GROUP BY date_trunc('day', timestamp)
+                    UNION ALL
+                    SELECT
+                    SUM(settle_amount)::numeric as total, date_trunc('day', timestamp) as day FROM stripe
+                    WHERE timestamp > $1 AND timestamp < $2
+                    AND refunded = '0.00' AND status = 'succeeded'
+                    GROUP BY date_trunc('day', timestamp)
+                  ) as combined GROUP BY day ORDER BY day`;
+
 var server = new Hapi.Server({
   app: {
     stripe_secret: config.stripe_secret
@@ -107,13 +121,37 @@ server.method("total_by_country", (start_date, end_date, next) => {
   }
 });
 
+server.method("total_by_day", (start_date, end_date, next) => {
+  pg.connect(config.db_connection_string, (pool_error, client, pg_done) => {
+    if (pool_error) {
+      return next(Boom.badImplementation("A database pool connection error occurred", pool_error));
+    }
+
+    client.query(byday_query, [start_date, end_date], (byday_error, byday_result) => {
+      pg_done();
+
+      if (byday_error) {
+        return next(Boom.badImplementation("A byday database query error occurred", byday_error));
+      }
+
+      next(null, byday_result.rows);
+    });
+  });
+}, {
+  cache: {
+    expiresIn: 10 * 1000,
+    generateTimeout: 2 * 1000
+  }
+});
+
 server.route({
   method: "GET",
   path: "/",
   handler: function(request, reply) {
     reply({
       total_url: `${request.server.info.uri}/eoy-2014-total`,
-      total_bycountry_url: `${request.server.info.uri}/eoy-2014-bycountry`
+      total_bycountry_url: `${request.server.info.uri}/eoy-2014-bycountry`,
+      total_byday_url: `${request.server.info.uri}/eoy-byday`
     });
   }
 });
@@ -128,6 +166,25 @@ server.route({
           country_code: r.country_code,
           sum: parseFloat(r.total, 10),
           count: parseInt(r.donors, 10)
+        };
+      }));
+    });
+  },
+  config: {
+    cors: true,
+    jsonp: "callback"
+  }
+});
+
+server.route({
+  method: "GET",
+  path: "/eoy-byday",
+  handler: function(request, reply) {
+    server.methods.total_by_day(config.start_date, config.end_date, (query_error, results) => {
+      reply(query_error, results.map((r) => {
+        return {
+          day: r.day,
+          sum: parseFloat(r.total, 10)
         };
       }));
     });
