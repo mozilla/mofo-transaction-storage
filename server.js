@@ -35,16 +35,16 @@ var bycountry_query = `SELECT country_code, sum(total)::numeric AS total, sum(do
 
 
 var byday_query = `SELECT day, SUM(total) AS total FROM
-                  (SELECT SUM(settle_amount)::numeric as total, DATE(timestamp) as day FROM paypal
+                  (SELECT SUM(settle_amount)::numeric as total, date_trunc('day', timestamp) as day FROM paypal
                     WHERE timestamp > $1 AND timestamp < $2
                     AND ((type IN ('Donation', 'Payment') AND status = 'Completed') OR type = 'Temporary Hold')
-                    GROUP BY DATE(timestamp)
+                    GROUP BY date_trunc('day', timestamp)
                     UNION ALL
                     SELECT
-                    SUM(settle_amount)::numeric as total, DATE(timestamp) as day FROM stripe
+                    SUM(settle_amount)::numeric as total, date_trunc('day', timestamp) as day FROM stripe
                     WHERE timestamp > $1 AND timestamp < $2
                     AND refunded = '0.00' AND status = 'succeeded'
-                    GROUP BY DATE(timestamp)
+                    GROUP BY date_trunc('day', timestamp)
                   ) as combined GROUP BY day ORDER BY day`;
 
 var server = new Hapi.Server({
