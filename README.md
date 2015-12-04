@@ -39,7 +39,8 @@ CREATE TABLE stripe (
   status TEXT,
   country_code TEXT,
   name TEXT,
-  email TEXT
+  email TEXT,
+  recurring BOOLEAN NOT NULL DEFAULT FALSE
 );
 ```
 
