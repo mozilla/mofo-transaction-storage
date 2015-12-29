@@ -63,18 +63,19 @@ SELECT aggregates.email,
     MAX(combined."timestamp") as most_recent_donation_date,
     SUM(
         CASE
-            WHEN combined.status='Completed'::text AND combined."timestamp" > (NOW() - INTERVAL '120 days'::interval) THEN 1
+            WHEN ( combined.status='Completed'::text OR combined.status='succeeded'::text ) AND combined."timestamp" > (NOW() - INTERVAL '120 days'::interval) THEN 1
             ELSE 0
         END) as num_completed_in_prior_months,
     SUM(
         CASE
+            -- Is there a Stripe equivalent status?
             WHEN combined.status='Reversed'::text THEN 1
             ELSE 0
         END) as num_reversed,
     COUNT(1) as number_of_donations,
     MAX(
         CASE
-            WHEN combined.status='Completed'::text THEN
+            WHEN ( combined.status='Completed'::text OR combined.status='succeeded'::text ) THEN
                 -- use settle_amount if available
                 CASE
                     WHEN combined.settle_amount IS NOT NULL THEN combined.settle_amount
