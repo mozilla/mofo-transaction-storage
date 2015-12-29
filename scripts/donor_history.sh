@@ -5,7 +5,8 @@ set -o nounset
 set -o pipefail
 #set -o xtrace
 
-SCRATCH_FILE="scratch/donorhistory_`date -u +%FT%H-%M-%SZ`.csv"
+# Need to output time as PST because that's what the SFMC account setting is
+SCRATCH_FILE="scratch/donorhistory_`TZ=America/Los_Angeles date +%FT%H-%M-%S`.csv"
 SFTP_BATCH_FILE=`cat <<EOF
 cd FoundationDonors/
 ls
