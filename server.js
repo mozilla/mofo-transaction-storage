@@ -7,11 +7,11 @@ config.port = env.get("PORT");
 
 var Boom = require("boom");
 var Hapi = require("hapi");
-var pg;
-try {
-  pg = require("pg").native;
-} catch (ignore_error) {
-  pg = require("pg");
+var pg = require('pg');
+var pgNative = pg.native; 
+
+if(pgNative) {
+  pg = pgNative;
 }
 
 var paypal_total_query = `SELECT SUM(settle_amount)::numeric FROM paypal WHERE timestamp > $1 AND timestamp < $2
@@ -64,7 +64,8 @@ server.register(require("hapi-auth-bearer-token"), function(err) {});
     validateFunc: function(token, callback) {
       // this = request
       callback(null, token === this.server.settings.app.stripe_secret, { token: token });
-    }
+    },
+    accessTokenName: "token"
   });
 
 server.method("total", function(start_date, end_date, next) {

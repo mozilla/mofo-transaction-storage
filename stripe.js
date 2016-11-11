@@ -19,7 +19,7 @@ module.exports = function(request, reply) {
 
   return process_charge(event.data.object, function(err) {
     if (err) {
-      return reply(boom.wrap(err));
+      return reply(Boom.wrap(err));
     }
     reply();
   });

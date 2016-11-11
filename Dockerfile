@@ -5,12 +5,12 @@ USER app
 WORKDIR /app
 
 ENV HOME /app
-ENV NODE_ENGINE 4.2.1
+ENV NODE_ENGINE 6.9.1
 ENV PORT 3000
 
 RUN mkdir -p /app/heroku/node
 RUN mkdir -p /app/src
-RUN curl -s https://s3pository.heroku.com/node/v$NODE_ENGINE/node-v$NODE_ENGINE-linux-x64.tar.gz | tar --strip-components=1 -xz -C /app/heroku/node
+RUN curl -s https://nodejs.org/dist/v$NODE_ENGINE/node-v$NODE_ENGINE-linux-x64.tar.xz | tar --strip-components=1 -xz -C /app/heroku/node
 ENV PATH /app/heroku/node/bin:$PATH
 
 RUN mkdir -p /app/.profile.d

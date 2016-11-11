@@ -5,11 +5,11 @@ var env = new Habitat();
 
 var async = require("async");
 var moment = require("moment");
-var pg;
-try {
-  pg = require("pg").native;
-} catch (ignore_error) {
-  pg = require("pg");
+var pg = require('pg');
+var pgNative = pg.native; 
+
+if(pgNative) {
+  pg = pgNative;
 }
 
 var search_transactions = require("./lib/search")(
