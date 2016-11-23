@@ -55,6 +55,7 @@ var server = new Hapi.Server({
 });
 
 server.connection({
+  host: config.HOST,
   port: config.port
 });
 
