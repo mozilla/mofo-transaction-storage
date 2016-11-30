@@ -151,8 +151,8 @@ server.route({
   path: "/",
   handler: function(request, reply) {
     reply({
-      total_url: `${request.server.info.uri}/eoy-2014-total`,
-      total_bycountry_url: `${request.server.info.uri}/eoy-2014-bycountry`,
+      total_url: `${request.server.info.uri}/eoy-2016-total`,
+      total_bycountry_url: `${request.server.info.uri}/eoy-2016-bycountry`,
       total_byday_url: `${request.server.info.uri}/eoy-byday`
     });
   }
