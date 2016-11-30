@@ -26,7 +26,8 @@ CREATE TABLE paypal (
   settle_amount MONEY,
   fee_amount MONEY,
   currency TEXT,
-  country_code TEXT
+  country_code TEXT,
+  thunderbird BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE stripe (
@@ -40,7 +41,8 @@ CREATE TABLE stripe (
   country_code TEXT,
   name TEXT,
   email TEXT,
-  recurring BOOLEAN NOT NULL DEFAULT FALSE
+  recurring BOOLEAN NOT NULL DEFAULT FALSE,
+  thunderbird BOOLEAN NOT NULL DEFAULT FALSE
 );
 ```
 

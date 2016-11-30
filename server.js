@@ -14,7 +14,7 @@ if(pgNative) {
   pg = pgNative;
 }
 
-var paypal_total_query = `SELECT SUM(settle_amount)::numeric FROM paypal WHERE timestamp > $1 AND timestamp < $2
+var paypal_total_query = `SELECT SUM(settle_amount)::numeric FROM paypal WHERE thunderbird = FALSE AND timestamp > $1 AND timestamp < $2
                           AND ((type IN ('Donation', 'Payment', 'Recurring Payment') AND status = 'Completed')
                           OR type = 'Temporary Hold');`;
 var stripe_total_query = `SELECT SUM(settle_amount)::numeric FROM stripe WHERE refunded = '0.00'
@@ -22,13 +22,13 @@ var stripe_total_query = `SELECT SUM(settle_amount)::numeric FROM stripe WHERE r
 
 var bycountry_query = `SELECT country_code, sum(total)::numeric AS total, sum(donors) AS donors FROM (
                        SELECT country_code, sum(settle_amount)::numeric AS total, count(*) AS donors FROM paypal
-                       WHERE timestamp > $1 AND timestamp < $2
+                       WHERE thunderbird = FALSE AND timestamp > $1 AND timestamp < $2
                        AND ((type IN ('Donation', 'Payment', 'Recurring Payment') AND status = 'Completed')
                        OR type = 'Temporary Hold') AND country_code IS NOT NULL
                        GROUP BY country_code
                        UNION ALL
                        SELECT country_code, sum(settle_amount)::numeric, count(*) FROM stripe
-                       WHERE timestamp > $1 AND timestamp < $2
+                       WHERE thunderbird = FALSE AND timestamp > $1 AND timestamp < $2
                        AND refunded = '0.00' AND status = 'succeeded'
                        GROUP BY country_code
                        ) AS bycountry GROUP BY bycountry.country_code ORDER BY bycountry.country_code`;
@@ -36,13 +36,13 @@ var bycountry_query = `SELECT country_code, sum(total)::numeric AS total, sum(do
 
 var byday_query = `SELECT day, SUM(total) AS total FROM
                   (SELECT SUM(settle_amount)::numeric as total, date_trunc('day', timestamp) as day FROM paypal
-                    WHERE timestamp > $1 AND timestamp < $2
+                    WHERE thunderbird = FALSE AND timestamp > $1 AND timestamp < $2
                     AND ((type IN ('Donation', 'Payment', 'Recurring Payment') AND status = 'Completed') OR type = 'Temporary Hold')
                     GROUP BY date_trunc('day', timestamp)
                     UNION ALL
                     SELECT
                     SUM(settle_amount)::numeric as total, date_trunc('day', timestamp) as day FROM stripe
-                    WHERE timestamp > $1 AND timestamp < $2
+                    WHERE thunderbird = FALSE AND timestamp > $1 AND timestamp < $2
                     AND refunded = '0.00' AND status = 'succeeded'
                     GROUP BY date_trunc('day', timestamp)
                   ) as combined GROUP BY day ORDER BY day`;
