@@ -21,13 +21,13 @@ var stripe_total_query = `SELECT SUM(settle_amount)::numeric FROM stripe WHERE r
                           AND status = 'succeeded' AND timestamp > $1 AND timestamp < $2;`;
 
 var bycountry_query = `SELECT country_code, sum(total)::numeric AS total, sum(donors) AS donors FROM (
-                       SELECT country_code, sum(amount)::numeric AS total, count(*) AS donors FROM paypal
+                       SELECT country_code, sum(settle_amount)::numeric AS total, count(*) AS donors FROM paypal
                        WHERE timestamp > $1 AND timestamp < $2
                        AND ((type IN ('Donation', 'Payment', 'Recurring Payment') AND status = 'Completed')
                        OR type = 'Temporary Hold') AND country_code IS NOT NULL
                        GROUP BY country_code
                        UNION ALL
-                       SELECT country_code, sum(amount)::numeric, count(*) FROM stripe
+                       SELECT country_code, sum(settle_amount)::numeric, count(*) FROM stripe
                        WHERE timestamp > $1 AND timestamp < $2
                        AND refunded = '0.00' AND status = 'succeeded'
                        GROUP BY country_code
