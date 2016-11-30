@@ -17,7 +17,7 @@ if(pgNative) {
 var paypal_total_query = `SELECT SUM(settle_amount)::numeric FROM paypal WHERE thunderbird = FALSE AND timestamp > $1 AND timestamp < $2
                           AND ((type IN ('Donation', 'Payment', 'Recurring Payment') AND status = 'Completed')
                           OR type = 'Temporary Hold');`;
-var stripe_total_query = `SELECT SUM(settle_amount)::numeric FROM stripe WHERE refunded = '0.00'
+var stripe_total_query = `SELECT SUM(settle_amount)::numeric FROM stripe WHERE thunderbird = FALSE AND refunded = '0.00'
                           AND status = 'succeeded' AND timestamp > $1 AND timestamp < $2;`;
 
 var bycountry_query = `SELECT country_code, sum(total)::numeric AS total, sum(donors) AS donors FROM (
